@@ -1,0 +1,14 @@
+{
+"temperature":0,
+"humidity":2,
+"light":3,
+"dust":4
+}
+
+
+
+{
+"r":0,
+"g":2,
+"b":3
+}
