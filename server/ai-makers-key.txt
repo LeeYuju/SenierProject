@@ -1,0 +1,6 @@
+Client Key
+Y2xpZW50X2tleTE1NTkzMjkyNTc1Mzk=
+ID
+Y2xpZW50X2lkMTU1OTMyOTI1NzUzOQ==
+Client Secret
+Y2xpZW50X3NlY3JldDE1NTkzMjkyNTc1Mzk=

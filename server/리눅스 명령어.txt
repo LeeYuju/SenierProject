@@ -1,0 +1,2 @@
+php파일 저장 :
+/var/www/html

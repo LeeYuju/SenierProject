@@ -1,0 +1,21 @@
+공인 ip : 	101.101.164.197
+서버 아이디 : root
+서버 비밀번호 : 무드등703!!
+
+mysql 접속법 명령어 : mysql -u mood -p
+mysql 아이디 : mood
+mysql 비밀번호 : password
+
+http 포트 : 80
+ssh 포트 : 22
+mysql 포트 : 3306
+mqtt 포트 : 1883
+
+
+101.101.164.197/insert_user_data.php?ID=12&PASSWORD=12&AGE=14&NAME=12&EMAIL=12&DEVICE=12
+101.101.164.197/get_user_data.php?ID=12
+101.101.164.197/delete_user_data.php?ID=12
+101.101.164.197/update_user_data.php?ID=12&PASSWORD=12&AGE=14&NAME=12&EMAIL=12&DEVICE=12
+
+
+101.101.164.197/insert_dust_data.php?deviceId=123&dust=12
