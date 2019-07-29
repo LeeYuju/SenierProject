@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 #for tts
 from __future__ import print_function
 import time
@@ -62,6 +62,9 @@ subTopic = "moodlight/inTopic/"
 
 #해당 디바이스의 아이디!!
 deviceId = "123"
+
+#날씨 요청 상태
+weatherState = False
 
 #네오픽셀 핀 및 초기화
 pixel_pin = board.D12

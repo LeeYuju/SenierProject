@@ -50,24 +50,27 @@ def getText2VoiceStream(inText,inFileName):
 	return response.resOptions.resultCd
 
 
-#ì•„ë‘ì´ë…¸ì™€ í†µì‹  í¬íŠ¸ í™•ë³´
+#¾ÆµÎÀÌ³ë¿Í Åë½Å Æ÷Æ® È®º¸
 port = "/dev/ttyUSB0"
 serialFromArduino = serial.Serial(port, 9600)
 serialFromArduino.flushInput()
 
-#mqtt ë¸Œë¡œì»¤ ë° í† í”½ì •ì˜
+#mqtt ºê·ÎÄ¿ ¹× ÅäÇÈÁ¤ÀÇ
 broker="101.101.164.197"
 pubTopic = "moodlight/onTopic/"
 subTopic = "moodlight/inTopic/"
 
-#í•´ë‹¹ ë””ë°”ì´ìŠ¤ì˜ ì•„ì´ë””!!
+#ÇØ´ç µð¹ÙÀÌ½ºÀÇ ¾ÆÀÌµð!!
 deviceId = "123"
 
-#ë„¤ì˜¤í”½ì…€ í•€ ë° ì´ˆê¸°í™”
+#³¯¾¾ ¿äÃ» »óÅÂ
+weatherState = False
+
+#³×¿ÀÇÈ¼¿ ÇÉ ¹× ÃÊ±âÈ­
 pixel_pin = board.D12
 pixels = neopixel.NeoPixel(pixel_pin, 12, brightness=0.2, auto_write=False, pixel_order=neopixel.GRB)
 
-# mqtt ë©”ì„¸ì§€ ìˆ˜ì‹ ì‹œ ì‹¤í–‰ë˜ëŠ” ì½œë°±í•¨ìˆ˜
+# mqtt ¸Þ¼¼Áö ¼ö½Å½Ã ½ÇÇàµÇ´Â ÄÝ¹éÇÔ¼ö
 def on_message(client, userdata, message):
     time.sleep(1)
     print("received message =",str(message.payload.decode("utf-8")))
@@ -78,24 +81,24 @@ def on_message(client, userdata, message):
     dict = json.loads(str(message.payload.decode("utf-8")))
     actNeoPixel(dict['r'],dict['g'],dict['b'])
 
-# ë„¤ì˜¤í”½ì…€ rgb ledìˆ˜í–‰
+# ³×¿ÀÇÈ¼¿ rgb led¼öÇà
 def actNeoPixel(r, g, b):
     print("act pixel")
     pixels.fill((r, g, b))
     pixels.show()
 
-# ì•„ë‘ì´ë…¸ì—ì„œ ë°›ì€ ì„¼ì„œ ë°ì´í„°ë¥¼ ì„œë²„ë¡œ ì „ì†¡
+# ¾ÆµÎÀÌ³ë¿¡¼­ ¹ÞÀº ¼¾¼­ µ¥ÀÌÅÍ¸¦ ¼­¹ö·Î Àü¼Û
 def publishSensorData(input):
     client.publish(pubTopic + deviceId, input)
     if "{" in str(input):
         dict = json.loads(str(input))
         sendDustAlarm(dict['dust'])
 
-# ë¯¸ì„¸ë¨¼ì§€ ìˆ˜ì¹˜ê°€ ì¼ì • ìˆ˜ì¤€ ì´ìƒì¸ ê²½ìš° ì„œë²„ë¡œ í‘¸ì‹œì•ŒëžŒ ìš”ì²­
+# ¹Ì¼¼¸ÕÁö ¼öÄ¡°¡ ÀÏÁ¤ ¼öÁØ ÀÌ»óÀÎ °æ¿ì ¼­¹ö·Î Çª½Ã¾Ë¶÷ ¿äÃ»
 def sendDustAlarm(dust):
     print("json dust : ")
     print(dust)
-    if dust >= 0.5: #ë¯¸ì„¸ë¨¼ì§€ ê²½ê³  ìˆ˜ì¤€ 100
+    if dust >= 0.5: #¹Ì¼¼¸ÕÁö °æ°í ¼öÁØ 100
         url = "http://101.101.164.197/insert_dust_data.php"
         url += "?deviceId="
         url += deviceId
@@ -104,65 +107,65 @@ def sendDustAlarm(dust):
         r = requests.get(url)
 
 
-# ë‚ ì”¨ ë‚˜íƒ€ë‚´ê¸° ì‹ í˜¸ ìˆ˜ì‹  ì‹œ ìž‘ë™
+# ³¯¾¾ ³ªÅ¸³»±â ½ÅÈ£ ¼ö½Å ½Ã ÀÛµ¿
 def actWeatherData():
     print("actWeather")
     output_file = "test.wav"
     getText2VoiceStream(getWeatherData(), output_file)
     MS.play_file(output_file)
-    print( output_file + "ì´ ìƒì„±ë˜ì—ˆìœ¼ë‹ˆ íŒŒì¼ì„ í™•ì¸ë°”ëžë‹ˆë‹¤. \n\n\n")
+    print( output_file + "ÀÌ »ý¼ºµÇ¾úÀ¸´Ï ÆÄÀÏÀ» È®ÀÎ¹Ù¶ø´Ï´Ù. \n\n\n")
 
-# í˜„ ìœ„ì¹˜ì˜ ë‚ ì”¨ì •ë³´ ë°›ì•„ë‚´ê¸°
+# Çö À§Ä¡ÀÇ ³¯¾¾Á¤º¸ ¹Þ¾Æ³»±â
 def getWeatherData():
-    #ë„¤íŠ¸ì›Œí¬ ìƒ í˜„ ìœ„ì¹˜ ì¶”ì 
+    #³×Æ®¿öÅ© »ó Çö À§Ä¡ ÃßÀû
     geo = geocoder.ip('me')
     latlng = geo.latlng
     state = geo.state
     print(state)
-    # open weather map apií™œìš© -> ë¶„ë‹¹ 60íšŒ ì½œ ë¬´ë£Œ
+    # open weather map apiÈ°¿ë -> ºÐ´ç 60È¸ ÄÝ ¹«·á
     owm = OWM('4cef2e1e7c19f03b36ed971bac0be5fc')
     obs = owm.weather_at_coords(latlng[0], latlng[1])
     location = obs.get_location()
     print(location.get_name())
     w = obs.get_weather()
     print(w.get_status())
-    result = "í˜„ìž¬ ë‚ ì”¨ëŠ” " + getWeatherStatus(str(w.get_status())) + "ìž…ë‹ˆë‹¤."
-    result += ("ê¸°ì˜¨ì€" + str(w.get_temperature(unit='celsius')['temp']) + ", ")
-    result += "ìŠµë„ëŠ”" + str(w.get_humidity()) + "ì´ë©° "
-    result += "í’ì†ì€" + str(w.get_wind()['speed']) + "ìž…ë‹ˆë‹¤."
+    result = "ÇöÀç ³¯¾¾´Â " + getWeatherStatus(str(w.get_status())) + "ÀÔ´Ï´Ù."
+    result += ("±â¿ÂÀº" + str(w.get_temperature(unit='celsius')['temp']) + ", ")
+    result += "½Àµµ´Â" + str(w.get_humidity()) + "ÀÌ¸ç "
+    result += "Ç³¼ÓÀº" + str(w.get_wind()['speed']) + "ÀÔ´Ï´Ù."
     neopixelTemp(w.get_temperature(unit='celsius')['temp'])
     print(result)
     return result
 
 def getWeatherStatus(status):
     if status in "Thunderstorm":
-        return "ì²œë‘¥"
+        return "ÃµµÕ"
     elif status in "Drizzle":
-        return "ì´ìŠ¬ë¹„"
+        return "ÀÌ½½ºñ"
     elif status in "Rain":
-        return "ë¹„"
+        return "ºñ"
     elif status in "Snow":
-        return "ëˆˆ"
+        return "´«"
     elif status in "Mist":
-        return "ì•ˆê°œ"
+        return "¾È°³"
     elif status in "Smoke":
-        return "ì—°ê¸°"
+        return "¿¬±â"
     elif status in "Haze":
-        return "ì—°ë¬´"
+        return "¿¬¹«"
     elif status in "Dust":
-        return "ë¯¸ì„¸ë¨¼ì§€"
+        return "¹Ì¼¼¸ÕÁö"
     elif status in "Fog":
-        return "ì•ˆê°œ"
+        return "¾È°³"
     elif status in "Sand":
-        return "í™©ì‚¬"
+        return "È²»ç"
     elif status in "Ash":
-        return "ìž¬"
+        return "Àç"
     elif status in "Squall":
-        return "íƒœí’"
+        return "ÅÂÇ³"
     elif status in "Cloud":
-        return "íë¦¼"
+        return "Èå¸²"
     else:
-        return "ë§‘ìŒ"
+        return "¸¼À½"
 
 def neopixelTemp(temp):
     if temp >= 20:
@@ -170,7 +173,7 @@ def neopixelTemp(temp):
     else:
         actNeoPixel(0,255,0);
 
-# mqtt ì—°ê²° ë° êµ¬ë…
+# mqtt ¿¬°á ¹× ±¸µ¶
 client= paho.Client("client-001")
 client.on_message=on_message
 print("connecting to broker ",broker)
@@ -182,7 +185,7 @@ time.sleep(2)
 print("publishing start")
 
 while(True):
-    # ì•„ë‘ì´ë…¸ë¡œ ë¶€í„° ì„¼ì„œë°ì´í„° ìˆ˜ì‹  ì‹œ
+    # ¾ÆµÎÀÌ³ë·Î ºÎÅÍ ¼¾¼­µ¥ÀÌÅÍ ¼ö½Å ½Ã
     if(serialFromArduino.inWaiting() > 0):
         input = serialFromArduino.readline().decode("utf-8")
         print(input)
